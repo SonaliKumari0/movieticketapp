@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-q76m0!9kw3+u&zm%v*h2i3^79m%3qi=b6r#x++=exkm*3g-+as
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['movieticketapp-fual.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
