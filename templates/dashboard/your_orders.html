@@ -1,0 +1,537 @@
+{% extends 'base.html' %} 
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root {
+    --primary: #7b1fa2;
+    --primary-light: #9c27b0;
+    --primary-dark: #4a0072;
+    --accent: #ff4081;
+    --text-light: #ffffff;
+    --text-dark: #333333;
+    --gray-light: #f5f5f5;
+    --gray: #e0e0e0;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s ease;
+  }
+  
+  .page-container {
+    position: relative;
+    padding-top: 1rem;
+    background-color: var(--gray-light);
+    min-height: 100vh;
+  }
+  
+  h1 {
+    text-align: center;
+    color: var(--primary-dark);
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
+    position: relative;
+    padding-bottom: 10px;
+  }
+  
+  h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    border-radius: 2px;
+  }
+  
+  .no-tickets {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--text-light);
+    padding: 3rem;
+    border-radius: 15px;
+    box-shadow: var(--shadow-md);
+    margin: 2rem auto;
+    max-width: 500px;
+  }
+  
+  .home-button {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    background-color: var(--primary);
+    color: var(--text-light);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+  }
+  
+  .home-button:hover {
+    background-color: var(--primary-dark);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .ticket-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+  
+  .tickets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 24px;
+  }
+
+  /* Responsive breakpoints */
+  @media (max-width: 768px) {
+    .page-container {
+      padding: 0.5rem;
+    }
+    
+    .ticket-container {
+      padding: 1rem;
+      gap: 20px;
+    }
+    
+    .tickets-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    
+    .home-button {
+      top: 20px;
+      right: 15px;
+      width: 35px;
+      height: 35px;
+    }
+    
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .no-tickets {
+      padding: 2rem;
+      margin: 1rem auto;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .ticket-container {
+      padding: 0.5rem;
+    }
+    
+    h1 {
+      font-size: 1.6rem;
+    }
+    
+    .no-tickets {
+      padding: 1.5rem;
+    }
+  }
+  
+  .ticket {
+    background-color: var(--text-light);
+    border: none;
+    border-top: 5px solid var(--primary);
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .ticket:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .ticket::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 50%, var(--accent) 100%);
+  }
+  
+  .ticket h2 {
+    margin-top: 0;
+    font-size: 1.3rem;
+    color: var(--primary-dark);
+    position: relative;
+    padding-bottom: 10px;
+    max-height: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+  }
+  
+  .ticket h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background-color: var(--accent);
+    border-radius: 3px;
+  }
+  
+  .ticket-info {
+    flex: 1;
+  }
+  
+  .ticket p {
+    margin: 0.5rem 0;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .ticket p strong {
+    color: var(--primary);
+    margin-right: 5px;
+    min-width: 70px;
+  }
+  
+  .seats {
+    margin-top: 15px;
+  }
+  
+  .seats-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--primary-dark);
+  }
+  
+  .seat-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .seat-badge {
+    background-color: var(--primary-light);
+    color: var(--text-light);
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .seat-badge:hover {
+    background-color: var(--primary);
+    box-shadow: var(--shadow-sm);
+    transform: scale(1.05);
+  }
+  
+  .ticket-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    padding-top: 15px;
+    border-top: 1px dashed var(--gray);
+  }
+  
+  .cancel-button {
+    width: 100%;
+  }
+  
+  .cancel-button a {
+    background-color: var(--accent);
+    color: var(--text-light);
+    padding: 10px 0;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: var(--transition);
+    display: block;
+    text-align: center;
+    letter-spacing: 0.5px;
+    width: 100%;
+  }
+  
+  .cancel-button a:hover {
+    background-color: #e91e63;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  
+  .movie-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: var(--primary-light);
+    opacity: 0.15;
+    font-size: 1.5rem;
+  }
+  
+  .ticket-status {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--primary-light);
+    color: var(--text-light);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Modal styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    background-color: var(--text-light);
+    border-radius: 15px;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    animation: modalFadeIn 0.3s;
+  }
+
+  @keyframes modalFadeIn {
+    from {opacity: 0; transform: translateY(-20px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+
+  .modal-title {
+    color: var(--primary-dark);
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+
+  .modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+  }
+
+  .modal-btn {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .confirm-btn {
+    background-color: var(--accent);
+    color: var(--text-light);
+  }
+
+  .confirm-btn:hover {
+    background-color: #e91e63;
+    box-shadow: var(--shadow-md);
+  }
+
+  .cancel-btn {
+    background-color: var(--gray);
+    color: var(--text-dark);
+  }
+
+  .cancel-btn:hover {
+    background-color: #bdbdbd;
+  }
+
+  /* Mobile adjustments for modal */
+  @media (max-width: 768px) {
+    .modal-content {
+      padding: 20px;
+      width: 95%;
+    }
+    
+    .modal-buttons {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .modal-btn {
+      width: 100%;
+    }
+  }
+
+  /* Additional mobile-specific styles */
+  @media (max-width: 768px) {
+    .ticket {
+      padding: 1rem;
+    }
+    
+    .ticket h2 {
+      font-size: 1.1rem;
+      -webkit-line-clamp: 2;
+    }
+    
+    .ticket p {
+      font-size: 0.85rem;
+      align-items: flex-start;
+    }
+    
+    .ticket p strong {
+      min-width: 60px;
+      margin-right: 8px;
+    }
+    
+    .seat-badge {
+      padding: 4px 6px;
+      font-size: 0.75rem;
+    }
+    
+    .cancel-button a {
+      padding: 8px 0;
+      font-size: 0.9rem;
+    }
+    
+    .ticket-status {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+    }
+  }: 0.01ms !important;
+    }
+  }
+  
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .ticket {
+      border: 2px solid var(--primary);
+    }
+    
+    .seat-badge {
+      border: 1px solid var(--primary);
+    }
+  }
+</style>
+
+<div class="page-container">
+    <a href="{% url 'filtered_movies' %}" class="home-button"><i class="fa-solid fa-house"></i></a>
+  
+  <div class="ticket-container">
+    <h1>Your Bookings</h1>
+    
+    {% if bookings %}
+      <div class="tickets-grid">
+        {% for booking in bookings %}
+          <div class="ticket">
+            <span class="ticket-status">{{ booking.booking_status }}</span>
+            <h2>{{ booking.showtime.movie.title }}</h2>
+            
+            <div class="ticket-info">
+              <p><strong>Theatre</strong> {{ booking.showtime.theater.name }}</p>
+              <p><strong>Address</strong> {{ booking.showtime.theater.address }}</p>
+              <p><strong>Date & Time</strong> {{ booking.showtime.show_time }}</p>
+              <p><strong>Screen</strong> {{ booking.showtime.screen_number }}</p>
+              
+              <div class="seats">
+                <div class="seats-label">Seats:</div>
+                <div class="seat-list">
+                  {% for seat in booking.bookingseats_set.all %}
+                    <span class="seat-badge">
+                      {{ seat.seat.row_label }}{{ seat.seat.seat_number }}
+                    </span>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            
+            <div class="ticket-actions">
+              <div class="cancel-button">
+                <a href="{% url 'cancel_booking' booking.id %}" class="cancel-booking-link" data-booking-id="{{ booking.id }}" data-movie-title="{{ booking.showtime.movie.title }}">
+                  <i class="fa-solid fa-xmark"></i> Cancel Ticket
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="no-tickets">
+        <i class="fa-solid fa-ticket fa-3x" style="color: var(--gray); margin-bottom: 15px;"></i>
+        <p style="text-align:center; color: var(--text-dark); font-size: 1.2rem;">No tickets found.</p>
+        <a href="{% url 'filtered_movies' %}" class="browse-movies-btn" style="display: inline-block; margin-top: 15px; background-color: var(--primary); color: var(--text-light); padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">Browse Movies</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+<div id="cancelConfirmModal" class="modal">
+  <div class="modal-content">
+    <h3 class="modal-title">Are You Sure?</h3>
+    <p>Are you sure you want to cancel your ticket for <span id="movieName"></span>?</p>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel-btn" id="closeModal">No, Keep Ticket</button>
+      <button class="modal-btn confirm-btn" id="confirmCancel">Yes, Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('cancelConfirmModal');
+    const closeBtn = document.getElementById('closeModal');
+    const confirmBtn = document.getElementById('confirmCancel');
+    const movieNameElement = document.getElementById('movieName');
+    let cancelUrl = '';
+    const cancelLinks = document.querySelectorAll('.cancel-booking-link');
+    cancelLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const movieTitle = this.getAttribute('data-movie-title');
+        cancelUrl = this.getAttribute('href');
+        movieNameElement.textContent = movieTitle;
+        modal.style.display = 'flex';
+      });
+    });
+    closeBtn.addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+    confirmBtn.addEventListener('click', function() {
+      window.location.href = cancelUrl;
+    });
+    window.addEventListener('click', function(event) {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  });
+</script>
+{% endblock %}

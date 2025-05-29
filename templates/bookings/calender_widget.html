@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .calendar-container {
+        max-width: 580px;
+        margin: 20px auto;
+        padding: 12px;
+        position: relative;
+    }
+    
+    .calendar-header {
+        text-align: center;
+        margin-bottom: 15px;
+        color: #6a1b9a;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        position: relative;
+    }
+    
+    .calendar-header::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(to right, #9c27b0, #ce93d8);
+        border-radius: 3px;
+    }
+    
+    .scroll-hint {
+        font-size: 12px;
+        color: #9e9e9e;
+        text-align: center;
+        margin-top: 2px;
+        font-style: italic;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    @media (max-width: 580px) {
+        .scroll-hint {
+            opacity: 0.7;
+        }
+    }
+    
+    .calendar {
+        display: flex;
+        gap: 12px;
+        padding: 20px;
+        overflow-x: auto;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #fff1f2, #ede7f6, #e3f2fd);
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(106, 27, 154, 0.15);
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        position: relative;
+        scroll-behavior: smooth;
+    }
+    
+    .calendar::before, .calendar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        width: 60px;
+        height: 100%;
+        z-index: 5;
+        pointer-events: none;
+    }
+    
+    .calendar::before {
+        left: 0;
+        background: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+    }
+    
+    .calendar::after {
+        right: 0;
+        background: linear-gradient(to left, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+    }
+    
+    .calendar::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .calendar a {
+        text-decoration: none;
+        position: relative;
+    }
+    
+    .day {
+        flex: 0 0 auto;
+        width: 55px;
+        height: 75px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        color: #333;
+        font-family: 'Poppins', 'Segoe UI', sans-serif;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .day::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(to right, transparent, #ce93d8, transparent);
+        transform: translateX(-100%);
+        transition: transform 0.5s ease;
+    }
+    
+    .day:hover {
+        transform: translateY(-5px);
+        background-color: #f9f5fb;
+        border-color: #e1bee7;
+        box-shadow: 0 8px 16px rgba(106, 27, 154, 0.15);
+    }
+    
+    .day:hover::before {
+        transform: translateX(0);
+    }
+    
+    .today {
+        background: linear-gradient(135deg, #6a1b9a, #8e24aa);
+        color: #fff !important;
+        font-weight: bold;
+        border: 2px solid #4a148c;
+        box-shadow: 0 6px 15px rgba(106, 27, 154, 0.25);
+    }
+    
+    .today::after {
+        content: '';
+        position: absolute;
+        bottom: 6px;
+        width: 5px;
+        height: 5px;
+        background-color: #fff;
+        border-radius: 50%;
+    }
+    
+    .day span {
+        position: relative;
+        z-index: 1;
+        transition: transform 0.2s ease;
+    }
+    
+    .day:hover span {
+        transform: scale(1.05);
+    }
+    
+    .day span:first-child {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: inherit;
+        opacity: 0.9;
+    }
+    
+    .day span:nth-child(2) {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 3px 0;
+        color: inherit;
+    }
+    
+    .day span:last-child {
+        font-size: 10px;
+        font-weight: 500;
+        color: inherit;
+        opacity: 0.9;
+        letter-spacing: 0.3px;
+    }
+    
+    .scroll-button {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+        border: none;
+        color: #6a1b9a;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        opacity: 0;
+    }
+    
+    .calendar-container:hover .scroll-button {
+        opacity: 1;
+    }
+    
+    .scroll-button:hover {
+        background-color: #f3e5f5;
+        transform: translateY(-50%) scale(1.1);
+    }
+    
+    .scroll-button.left {
+        left: 5px;
+    }
+    
+    .scroll-button.right {
+        right: 5px;
+    }
+    
+    .scroll-button:focus {
+        outline: none;
+    }
+    
+    @media (max-width: 500px) {
+        .day {
+            width: 48px;
+            height: 70px;
+        }
+        
+        .calendar {
+            padding: 16px 10px;
+        }
+        
+        .calendar-header {
+            font-size: 16px;
+        }
+    }
+    
+    /* Animation for today marker */
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .today::after {
+        animation: pulse 1.5s infinite;
+    }
+</style>
+
+<div class="calendar-container">
+    <div class="calendar-header">Select a Date</div>
+    <div class="scroll-hint">Swipe to see more dates</div>
+    
+    <div class="calendar">
+        <button class="scroll-button left" id="scrollLeft">&#10094;</button>
+        {% for day in week %}
+        <a href="{% url 'theater_showtime_date' slug day.date %}" aria-label="{{ day.name }} {{ day.day }} {{ day.month }}">
+            <div class="day {% if day.date == today %}today{% endif %}">
+                <span>{{ day.name }}</span>
+                <span>{{ day.day }}</span>
+                <span>{{ day.month }}</span>
+            </div>
+        </a>
+        {% endfor %}
+        <button class="scroll-button right" id="scrollRight">&#10095;</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendar = document.querySelector('.calendar');
+        const scrollLeftBtn = document.getElementById('scrollLeft');
+        const scrollRightBtn = document.getElementById('scrollRight');
+        function checkScroll() {
+            if (calendar.scrollWidth <= calendar.clientWidth) {
+                scrollLeftBtn.style.display = 'none';
+                scrollRightBtn.style.display = 'none';
+                document.querySelector('.scroll-hint').style.display = 'none';
+            } else {
+                scrollLeftBtn.style.display = 'flex';
+                scrollRightBtn.style.display = 'flex';
+            }
+        }
+        scrollLeftBtn.addEventListener('click', function() {
+            calendar.scrollBy({ left: -200, behavior: 'smooth' });
+        });
+        
+        scrollRightBtn.addEventListener('click', function() {
+            calendar.scrollBy({ left: 200, behavior: 'smooth' });
+        });
+        const days = document.querySelectorAll('.day');
+        days.forEach(day => {
+            day.addEventListener('mouseover', function() {
+                days.forEach(d => {
+                    if (d !== day) d.style.opacity = '0.7';
+                });
+            });
+            
+            day.addEventListener('mouseout', function() {
+                days.forEach(d => {
+                    d.style.opacity = '1';
+                });
+            });
+        });
+        const today = document.querySelector('.today');
+        if (today) {
+            setTimeout(() => {
+                today.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'center'
+                });
+            }, 500);
+        }
+        checkScroll();
+        window.addEventListener('resize', checkScroll);
+    });
+</script>
+{% endblock %}

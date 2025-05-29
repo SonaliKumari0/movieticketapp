@@ -1,0 +1,5 @@
+{% comment %} {% extends 'base.html' %}
+{% block content %}
+    <h1>Welcome to the movie ticket booking {{user.username}}</h1>  
+    <a href="{% url 'logout' %}"><button>logout</button></a>
+{% endblock %} {% endcomment %}

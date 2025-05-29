@@ -1,0 +1,855 @@
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #fce4ec, #f3e5f5, #e8eaf6);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 10px;
+        position: relative;
+        margin: 0;
+        min-height: 100vh;
+    }
+
+    /* Home Icon - Responsive */
+    .home-icon {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        background: linear-gradient(135deg, #8e24aa, #6a1b9a);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(106, 27, 154, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 100;
+        text-decoration: none;
+        font-size: 18px;
+    }
+
+    .home-icon:hover {
+        transform: translateY(-3px) scale(1.1);
+        box-shadow: 0 6px 16px rgba(106, 27, 154, 0.4);
+        background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+    }
+
+    .home-icon::after {
+        content: "Home";
+        position: absolute;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        right: 100%;
+        margin-right: 10px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .home-icon:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Movie Details - Mobile First */
+    .movie-details {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 12px 30px rgba(106, 27, 154, 0.15);
+        animation: fadeIn 0.5s ease-in-out;
+        max-width: 100%;
+        width: 100%;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .movie-details:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 35px rgba(106, 27, 154, 0.2);
+    }
+
+    .movie-details img {
+        width: 100%;
+        max-width: 200px;
+        margin: 0 auto;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease;
+        object-fit: cover;
+    }
+
+    .movie-details img:hover {
+        transform: scale(1.03);
+    }
+
+    .movie-info {
+        flex: 1;
+        text-align: center;
+    }
+
+    .movie-info h1 {
+        color: #6a1b9a;
+        font-size: 22px;
+        margin-bottom: 8px;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .movie-info h1::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(to right, #9c27b0, #ce93d8);
+        border-radius: 3px;
+    }
+
+    .rating-line {
+        font-size: 14px;
+        color: #444;
+        margin: 12px auto;
+        background: linear-gradient(to right, #f3e5f5, #e1bee7);
+        padding: 8px 12px;
+        border-radius: 8px;
+        display: inline-block;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-left: 3px solid #9c27b0;
+    }
+
+    .rating-line:hover {
+        background: linear-gradient(to right, #e1bee7, #d1c4e9);
+        transform: translateX(3px);
+    }
+
+    .movie-info p {
+        font-size: 14px;
+        color: #333;
+        margin: 8px 0;
+        line-height: 1.6;
+        padding-left: 5px;
+        border-left: 2px solid transparent;
+        transition: all 0.2s ease;
+        text-align: left;
+    }
+
+    .movie-info p:hover {
+        border-left: 2px solid #ce93d8;
+        padding-left: 8px;
+    }
+
+    .movie-info p strong {
+        color: #6a1b9a;
+        font-weight: 600;
+    }
+
+    .movie-info a.button {
+        display: inline-block;
+        background: linear-gradient(to right, #8e24aa, #9c27b0);
+        color: white;
+        padding: 10px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin: 8px 5px;
+        box-shadow: 0 4px 8px rgba(142, 36, 170, 0.3);
+        position: relative;
+        overflow: hidden;
+        font-size: 14px;
+    }
+
+    .movie-info a.button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .movie-info a.button:hover {
+        background: linear-gradient(to right, #6a1b9a, #8e24aa);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(142, 36, 170, 0.4);
+    }
+
+    .movie-info a.button:hover::before {
+        left: 100%;
+    }
+
+    /* Modal - Mobile Responsive */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 10;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        backdrop-filter: blur(8px);
+        background-color: rgba(0, 0, 0, 0.4);
+        transition: all 0.3s ease;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 95%;
+        max-width: 600px;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        animation: fadeInUp 0.5s ease-in-out;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #6a1b9a;
+        transform: rotate(90deg);
+        transition: all 0.3s ease;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f3e5f5;
+    }
+
+    .modal-header h2 {
+        color: #6a1b9a;
+        font-size: 18px;
+        margin: 0;
+        position: relative;
+    }
+
+    .modal-header h2::after {
+        content: '';
+        position: absolute;
+        bottom: -12px;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(to right, #9c27b0, #ce93d8);
+        border-radius: 3px;
+    }
+
+    .review-card {
+        display: flex;
+        align-items: flex-start;
+        background: linear-gradient(to right, #f9f3fc, #f5f5f9);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        gap: 12px;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .review-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        border-left: 3px solid #ce93d8;
+    }
+
+    .avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #9c27b0, #ce93d8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        font-size: 14px;
+        box-shadow: 0 3px 8px rgba(106, 27, 154, 0.3);
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .review-card:hover .avatar {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .review-text {
+        flex: 1;
+    }
+
+    .review-text p {
+        margin: 0;
+        color: #444;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+
+    .review-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+        padding-top: 6px;
+        border-top: 1px dashed #e1bee7;
+    }
+
+    .rating {
+        color: #6a1b9a;
+        font-weight: bold;
+        font-size: 12px;
+        padding: 3px 6px;
+        background-color: rgba(206, 147, 216, 0.2);
+        border-radius: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .review-card:hover .rating {
+        background-color: rgba(206, 147, 216, 0.4);
+    }
+
+    .delete-form button {
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 3px 6px;
+        margin: 0;
+        color: #e57373;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    .delete-form button:hover {
+        color: #d32f2f;
+        background-color: rgba(229, 115, 115, 0.1);
+        transform: scale(1.2);
+    }
+
+    .add-review-button {
+        background: linear-gradient(to right, #8e24aa, #9c27b0);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(142, 36, 170, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .add-review-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .add-review-button:hover {
+        background: linear-gradient(to right, #6a1b9a, #8e24aa);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(142, 36, 170, 0.4);
+    }
+
+    .add-review-button:hover::before {
+        left: 100%;
+    }
+
+    .no-reviews {
+        color: #888;
+        text-align: center;
+        font-style: italic;
+        margin: 20px 0;
+        padding: 15px;
+        background-color: #f9f5fb;
+        border-radius: 10px;
+        border: 1px dashed #e1bee7;
+        font-size: 14px;
+    }
+
+    .back-link {
+        text-decoration: none; 
+        color: #6a1b9a; 
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        margin-top: 12px;
+        font-size: 14px;
+    }
+
+    .back-link::before {
+        content: '←';
+        margin-right: 6px;
+        transition: transform 0.3s ease;
+    }
+
+    .back-link:hover {
+        color: #9c27b0;
+    }
+
+    .back-link:hover::before {
+        transform: translateX(-4px);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .blur-effect {
+        transition: filter 0.4s ease;
+    }
+
+    /* Tablet Styles */
+    @media (min-width: 600px) {
+        body {
+            padding: 30px 15px;
+        }
+
+        .home-icon {
+            width: 42px;
+            height: 42px;
+            font-size: 20px;
+            top: 18px;
+            right: 18px;
+        }
+
+        .movie-details {
+            flex-direction: row;
+            gap: 25px;
+            padding: 25px;
+            text-align: left;
+        }
+
+        .movie-details img {
+            width: 220px;
+            max-width: none;
+            margin: 0;
+        }
+
+        .movie-info {
+            text-align: left;
+        }
+
+        .movie-info h1 {
+            font-size: 24px;
+        }
+
+        .movie-info h1::after {
+            left: 0;
+            transform: none;
+        }
+
+        .rating-line {
+            font-size: 15px;
+            margin: 12px 0;
+        }
+
+        .movie-info p {
+            font-size: 15px;
+            margin: 10px 0;
+        }
+
+        .movie-info a.button {
+            padding: 10px 18px;
+            margin: 10px 10px 10px 0;
+            font-size: 15px;
+        }
+
+        .modal-content {
+            width: 90%;
+            padding: 25px;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+        }
+
+        .review-card {
+            padding: 16px;
+            gap: 14px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            font-size: 15px;
+        }
+
+        .review-text p {
+            font-size: 15px;
+        }
+
+        .rating {
+            font-size: 13px;
+            padding: 4px 7px;
+        }
+
+        .add-review-button {
+            padding: 11px 22px;
+            font-size: 15px;
+        }
+
+        .back-link {
+            font-size: 15px;
+        }
+    }
+
+    /* Desktop Styles - Keep original large screen layout */
+    @media (min-width: 960px) {
+        body {
+            padding: 40px 20px;
+        }
+
+        .home-icon {
+            width: 45px;
+            height: 45px;
+            font-size: 22px;
+            top: 20px;
+            right: 20px;
+        }
+
+        .home-icon::after {
+            font-size: 12px;
+        }
+
+        .movie-details {
+            gap: 30px;
+            padding: 30px;
+            max-width: 700px;
+        }
+
+        .movie-details:hover {
+            transform: translateY(-5px);
+        }
+
+        .movie-details img {
+            width: 260px;
+        }
+
+        .movie-info h1 {
+            font-size: 26px;
+        }
+
+        .rating-line {
+            font-size: 15px;
+        }
+
+        .movie-info p {
+            font-size: 15px;
+        }
+
+        .movie-info a.button {
+            padding: 10px 18px;
+            margin-top: 14px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .modal-content {
+            width: 80%;
+            max-width: 700px;
+            padding: 30px;
+        }
+
+        .close {
+            font-size: 28px;
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+        }
+
+        .review-card {
+            padding: 18px;
+            margin-bottom: 14px;
+            gap: 14px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+        }
+
+        .review-text p {
+            font-size: 15px;
+        }
+
+        .review-footer {
+            margin-top: 10px;
+            padding-top: 8px;
+        }
+
+        .rating {
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+
+        .delete-form button {
+            font-size: 18px;
+            padding: 4px 8px;
+        }
+
+        .add-review-button {
+            padding: 12px 24px;
+            border-radius: 30px;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .no-reviews {
+            margin: 30px 0;
+            padding: 20px;
+        }
+    }
+
+    /* Large Desktop */
+    @media (min-width: 1200px) {
+        .movie-details {
+            max-width: 800px;
+        }
+
+        .modal-content {
+            max-width: 800px;
+        }
+    }
+
+    /* Extra Small Mobile */
+    @media (max-width: 480px) {
+        body {
+            padding: 15px 8px;
+        }
+
+        .home-icon {
+            width: 38px;
+            height: 38px;
+            font-size: 16px;
+            top: 12px;
+            right: 12px;
+        }
+
+        .movie-details {
+            padding: 15px;
+            gap: 15px;
+        }
+
+        .movie-details img {
+            max-width: 160px;
+        }
+
+        .movie-info h1 {
+            font-size: 20px;
+        }
+
+        .rating-line {
+            font-size: 13px;
+            padding: 6px 10px;
+        }
+
+        .movie-info p {
+            font-size: 13px;
+            margin: 6px 0;
+        }
+
+        .movie-info a.button {
+            padding: 8px 12px;
+            font-size: 13px;
+            margin: 6px 3px;
+        }
+
+        .modal-content {
+            width: 98%;
+            padding: 15px;
+            margin: 2% auto;
+        }
+
+        .modal-header h2 {
+            font-size: 16px;
+        }
+
+        .close {
+            font-size: 22px;
+        }
+
+        .review-card {
+            padding: 12px;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            font-size: 13px;
+        }
+
+        .review-text p {
+            font-size: 13px;
+        }
+
+        .rating {
+            font-size: 11px;
+            padding: 2px 5px;
+        }
+
+        .add-review-button {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .back-link {
+            font-size: 13px;
+        }
+    }
+</style>
+
+<!-- Home Icon -->
+<a href="{% url 'filtered_movies' %}" class="home-icon"><i class="fa-solid fa-house"></i></a>
+
+<div class="movie-details blur-effect" id="main-content">
+    <img src="{{ movie.image_url }}" alt="{{ movie.title }}">
+    <div class="movie-info">
+        <h1>{{ movie.title }}</h1>
+        <div class="rating-line" id="openModal">
+            <span>⭐ {{ rating|floatformat:1 }}/10</span> &nbsp;•&nbsp; <span>👥 {{ no_user }} reviews</span>
+        </div>
+        <p><strong>📅 Release Date:</strong> {{ movie.release_date }}</p>
+        <p><strong>⏱️ Duration:</strong> {{ movie.duration_minutes }} minutes</p>
+        <p><strong>👨‍🎤 Cast:</strong> {{ movie.cast }}</p>
+        <p><strong>📝 Synopsis:</strong> {{ movie.synopsis }}</p>
+
+        <div>
+            {% if movie.triller_url %}
+                <a href="{{ movie.triller_url }}" target="_blank" class="button">▶ Watch Trailer</a>
+            {% endif %}
+            <a href="{% url 'theater_showtime_date' movie.slug today %}" class="button">🎟️ Book Tickets</a>
+        </div>
+
+        <div>
+            <a href="{% url 'filtered_movies' %}" class="back-link">Back to movie list</a>
+        </div>
+    </div>
+</div>
+
+<div id="reviewModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>All Reviews ({{ no_user }})</h2>
+            <span class="close" id="closeModal">&times;</span>
+        </div>
+
+        {% if reviews %}
+            {% for review in reviews %}
+                <div class="review-card">
+                    <div class="avatar">{{ review.user.username|first|upper }}</div>
+                    <div class="review-text">
+                        <p>{{ review.review_text }}</p>
+                        <div class="review-footer">
+                            <span class="rating">⭐ {{ review.rating|floatformat:1 }}</span>
+                            <form action="{% url 'delete_review' review.review_id %}" method="post" class="delete-form">
+                                {% csrf_token %}
+                                <button type="submit" title="Delete Review">🗑️</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-reviews">No reviews yet. Be the first to leave one!</p>
+        {% endif %}
+
+        <center>
+            <a href="{% url 'add_review' movie.slug %}" class="add-review-button">✍️ Add Your Review</a>
+        </center>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById("reviewModal");
+    const openBtn = document.getElementById("openModal");
+    const closeBtn = document.getElementById("closeModal");
+    const mainContent = document.getElementById("main-content");
+
+    openBtn.onclick = function () {
+        modal.style.display = "block";
+        mainContent.style.filter = "blur(5px)";
+        setTimeout(() => {
+            modal.style.opacity = "1";
+        }, 50);
+    }
+
+    closeBtn.onclick = function () {
+        modal.style.opacity = "0";
+        mainContent.style.filter = "none";
+        setTimeout(() => {
+            modal.style.display = "none";
+        }, 300);
+    }
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.opacity = "0";
+            mainContent.style.filter = "none";
+            setTimeout(() => {
+                modal.style.display = "none";
+            }, 300);
+        }
+    }
+</script>
+{% endblock %}

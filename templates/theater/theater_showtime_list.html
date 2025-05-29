@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'bookings/calender_widget.html' %}
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    body {
+        background: linear-gradient(135deg, #ede7f6, #fce4ec);
+        font-family: 'Poppins', sans-serif;
+        color: #333;
+    }
+    .home-icon {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #8e24aa, #6a1b9a);
+        color: white;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(106, 27, 154, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 100;
+        text-decoration: none;
+        font-size: 22px;
+    }
+
+    .home-icon:hover {
+        transform: translateY(-3px) scale(1.1);
+        box-shadow: 0 6px 16px rgba(106, 27, 154, 0.4);
+        background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+    }
+
+    .showtime-container {
+        max-width: 1080px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+    
+    .page-title {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #2c3e50;
+        font-weight: 800;
+        font-size: 32px;
+        position: relative;
+    }
+    
+    .page-title:after {
+        content: '';
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #8e44ad, #3498db);
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 2px;
+    }
+    .theater-box {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 20px 24px;  /* Reduced from 28px to 20px */
+        margin-bottom: 25px; /* Reduced from 35px to 25px */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .theater-box:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    }
+    
+    .theater-box:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 6px;
+        height: 100%;
+        background: linear-gradient(to bottom, #8e44ad, #3498db);
+        border-radius: 160px 0 0 16px;
+    }
+    
+    .theater-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px; 
+    }
+    
+    .theater-name {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .theater-name i {
+        color: #8e44ad;
+    }
+    
+    .theater-rating {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: #f1f2f6;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    
+    .rating-star {
+        color: #ffa502;
+    }
+    
+    .theater-info {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 12px; 
+    }
+    
+    .icons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        font-size: 14px;
+        color: #555;
+    }
+    
+    .icon {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        transition: transform 0.2s ease;
+    }
+    
+    .icon:hover {
+        transform: translateY(-2px);
+    }
+    
+    .icon-ticket {
+        color: #3498db;
+    }
+    
+    .icon-food {
+        color: #e67e22;
+    }
+    
+    .icon-parking {
+        color: #27ae60;
+    }
+    
+    .theater-distance {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #7f8c8d;
+        font-weight: 500;
+    }
+    
+    .show-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px; /* Reduced from 14px to 12px */
+        margin-top: 14px;
+    }
+    
+    .show-time {
+        background: #e3fcef;
+        border: 2px solid #00b894;
+        border-radius: 30px;
+        padding: 10px 20px; /* Reduced from 12px 24px to 10px 20px */
+        font-size: 15px; /* Reduced from 16px to 15px */
+        font-weight: 600;
+        color: #007f5f;
+        transition: all 0.25s ease-in-out;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .show-time:hover {
+        background: #c1f7dc;
+        border-color: #00a97f;
+        color: #006c5e;
+        transform: scale(1.05);
+    }
+    .dolby-time {
+        background: #e0e7ff;
+        border-color: #667eea;
+        color: #434190;
+    }
+    
+    .dolby-time:hover {
+        background: #c3dafe;
+        border-color: #5a67d8;
+        color: #3c366b;
+    }
+    
+    .show-time a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    
+    .show-time:hover {
+        opacity: 1;
+        transform: scale(1);
+        top: -8px;
+        right: -8px;
+    }
+    
+    .info-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 15px; 
+        padding-top: 12px; 
+        border-top: 1px dashed #ddd;
+        font-size: 13px; 
+        color: #7f8c8d;
+        font-style: italic;
+    }
+    
+    .sold-out {
+        background: #f1f2f6;
+        border-color: #dfe4ea;
+        color: #a4b0be;
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+    
+    .sold-out:hover {
+        transform: scale(1);
+        background: #f1f2f6;
+        border-color: #dfe4ea;
+        color: #a4b0be;
+    }
+    
+    @keyframes pulse {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .theater-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .theater-info {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    .home-icon::after {
+        content: "Home";
+        position: absolute;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        right: 100%;
+        margin-right: 10px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .home-icon:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+</style>
+<a href="{% url 'filtered_movies' %}" class="home-icon"><i class="fa-solid fa-house"></i></a>
+<div class="showtime-container">
+    <h1 class="page-title">Movie Showtimes 🎥</h1>
+    
+    {% for show_time in theater_showtimes %}
+    <div class="theater-box">
+        <div class="theater-header">
+            <div class="theater-name">
+                <i class="fas fa-film"></i>
+                {{ show_time.0.theater }} 🎬
+            </div>
+            <div class="theater-rating">
+                <span class="rating-star">★</span> 4.6 ⭐
+            </div>
+        </div>
+        
+        <div class="theater-info">
+            <div class="icons">
+                <span class="icon icon-ticket">
+                    <i class="fas fa-mobile-alt"></i> M-Ticket 📱
+                </span>
+                <span class="icon icon-food">
+                    <i class="fas fa-utensils"></i> Food & Beverage 🍿
+                </span>
+                <span class="icon icon-parking">
+                    <i class="fas fa-parking"></i> Free Parking     
+                </span>
+            </div>
+            
+            <div class="theater-distance">
+                <i class="fas fa-map-marker-alt"></i> 3.5 km away 📍
+            </div>
+        </div>
+  
+        <div class="show-details">
+            {% for show in show_time %}
+                {% if forloop.counter == 1 %}
+                    <div class="show-time">
+                        <a href="{% url 'seat_selection' show.id %}">
+                            {{ show.show_time|date:"h:i A" }} 
+                        </a>
+                    </div>
+                {% elif forloop.counter == 2 %}
+                    <div class="show-time dolby-time">
+                        <a href="{% url 'seat_selection' show.id %}">
+                            {{ show.show_time|date:"h:i A" }} 
+                        </a>
+                    </div>
+                {% elif forloop.counter == 3 %}
+                    <div class="show-time sold-out">
+                        {{ show.show_time|date:"h:i A" }} ❌
+                    </div>
+                
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        <div class="info-line">
+            <div class="info-left">
+                <i class="fas fa-exclamation-circle"></i> Cancellation available up to 2 hours before showtime
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

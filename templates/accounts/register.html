@@ -1,0 +1,772 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load socialaccount %}
+{% providers_media_js %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #b2ebf2, #ce93d8, #e1f5fe);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+    }
+
+    @keyframes gradientBG {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    .container {
+        display: flex;
+        width: 100%;
+        max-width: 900px;
+        min-height: 600px;
+        max-height: 85vh;
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(138, 43, 226, 0.18);
+        overflow: hidden;
+        animation: fadeIn 0.8s ease-in-out;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .left-panel {
+        width: 40%;
+        background: linear-gradient(135deg, #673ab7, #9c27b0);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        padding: 40px 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .left-panel h1 {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+
+    .left-panel p {
+        font-size: 16px;
+        line-height: 1.6;
+        text-align: center;
+        margin-bottom: 30px;
+        position: relative;
+        z-index: 2;
+        opacity: 0.9;
+    }
+
+    .shape-1, .shape-2, .shape-3 {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 1;
+    }
+
+    .shape-1 {
+        width: 180px;
+        height: 180px;
+        background: rgba(255, 255, 255, 0.1);
+        bottom: -90px;
+        left: -45px;
+    }
+
+    .shape-2 {
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.15);
+        top: -30px;
+        right: -30px;
+    }
+
+    .shape-3 {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.07);
+        top: 40%;
+        left: 15%;
+    }
+
+    .form-wrapper {
+        width: 60%;
+        padding: 40px 35px;
+        display: flex;
+        flex-direction: column;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    /* Custom scrollbar for form wrapper */
+    .form-wrapper::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .form-wrapper::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+    }
+
+    .form-wrapper::-webkit-scrollbar-thumb {
+        background: rgba(156, 39, 176, 0.3);
+        border-radius: 10px;
+    }
+
+    .form-wrapper::-webkit-scrollbar-thumb:hover {
+        background: rgba(156, 39, 176, 0.5);
+    }
+
+    .form-wrapper h2 {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 600;
+        color: #6a1b9a;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .form-wrapper h2:after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -12px;
+        transform: translateX(-50%);
+        height: 3px;
+        width: 50px;
+        background: linear-gradient(to right, #8e24aa, #ba68c8);
+        border-radius: 2px;
+    }
+
+    /* Custom styling for crispy form elements */
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #4a0072;
+        font-size: 14px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 10px !important;
+        border: 1px solid #ddd !important;
+        background-color: #fafafa;
+        font-size: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #8e24aa !important;
+        box-shadow: 0 0 0 4px rgba(142, 36, 170, 0.15);
+        background-color: #fff;
+    }
+
+    .asteriskField {
+        color: #ff3d00;
+        margin-left: 3px;
+        font-weight: 600;
+    }
+
+    .btn-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 25px;
+        gap: 15px;
+    }
+
+    .btn-register {
+        width: 100%;
+        max-width: 280px;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        background: linear-gradient(to right, #673ab7, #9c27b0);
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(138, 43, 226, 0.2);
+        text-align: center;
+    }
+
+    .btn-register:hover {
+        background: linear-gradient(to right, #5e35b1, #8e24aa);
+        box-shadow: 0 10px 25px rgba(138, 43, 226, 0.35);
+        transform: translateY(-2px);
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 0;
+        color: #757575;
+        font-size: 13px;
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .divider:before, .divider:after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #e0e0e0;
+    }
+
+    .divider:before {
+        margin-right: 15px;
+    }
+
+    .divider:after {
+        margin-left: 15px;
+    }
+
+    .social-btn {
+        width: 100%;
+        max-width: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: #db4437;
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(219, 68, 55, 0.25);
+    }
+
+    .social-btn:hover {
+        background-color: #c1351d;
+        box-shadow: 0 6px 15px rgba(219, 68, 55, 0.35);
+        transform: translateY(-2px);
+    }
+
+    .social-btn i {
+        margin-right: 8px;
+        font-size: 18px;
+    }
+
+    .login-link {
+        width: 100%;
+        max-width: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: transparent;
+        color: #6a1b9a;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        border: 2px solid #9c27b0;
+        transition: all 0.3s;
+    }
+
+    .login-link:hover {
+        background-color: rgba(156, 39, 176, 0.1);
+        transform: translateY(-1px);
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Tablet Landscape - 1024px and below */
+    @media (max-width: 1024px) {
+        .container {
+            max-width: 750px;
+            min-height: 550px;
+        }
+        
+        .left-panel {
+            padding: 30px 25px;
+        }
+        
+        .left-panel h1 {
+            font-size: 24px;
+        }
+        
+        .left-panel p {
+            font-size: 14px;
+        }
+        
+        .form-wrapper {
+            padding: 30px 25px;
+        }
+        
+        .form-wrapper h2 {
+            font-size: 22px;
+        }
+        
+        .btn-container {
+            margin-top: 20px;
+            gap: 12px;
+        }
+    }
+
+    /* Tablet Portrait - 768px and below */
+    @media (max-width: 768px) {
+        body {
+            padding: 15px;
+        }
+        
+        .container {
+            flex-direction: column;
+            max-width: 500px;
+            min-height: auto;
+            max-height: 90vh;
+        }
+        
+        .left-panel {
+            width: 100%;
+            min-height: 180px;
+            padding: 25px 20px;
+        }
+        
+        .left-panel h1 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        
+        .left-panel p {
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        
+        .form-wrapper {
+            width: 100%;
+            padding: 25px 20px;
+            max-height: calc(90vh - 180px);
+        }
+        
+        .form-wrapper h2 {
+            font-size: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        
+        .form-control {
+            padding: 11px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-container {
+            margin-top: 20px;
+            gap: 12px;
+        }
+        
+        .btn-register, .social-btn, .login-link, .divider {
+            max-width: 100%;
+        }
+        
+        .btn-register {
+            padding: 11px;
+            font-size: 15px;
+        }
+        
+        .social-btn {
+            padding: 9px;
+            font-size: 13px;
+        }
+        
+        .login-link {
+            padding: 9px;
+            font-size: 13px;
+        }
+        
+        .divider {
+            font-size: 12px;
+        }
+    }
+
+    /* Mobile Landscape - 640px and below */
+    @media (max-width: 640px) {
+        .container {
+            max-width: 450px;
+        }
+        
+        .left-panel {
+            min-height: 160px;
+            padding: 20px 15px;
+        }
+        
+        .left-panel h1 {
+            font-size: 20px;
+        }
+        
+        .left-panel p {
+            font-size: 12px;
+        }
+        
+        .form-wrapper {
+            padding: 20px 15px;
+            max-height: calc(90vh - 160px);
+        }
+        
+        .form-wrapper h2 {
+            font-size: 18px;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-control {
+            padding: 10px 11px;
+            font-size: 13px;
+        }
+        
+        .btn-container {
+            gap: 10px;
+        }
+        
+        .social-btn i {
+            font-size: 16px;
+        }
+    }
+
+    /* Mobile Portrait - 480px and below */
+    @media (max-width: 480px) {
+        body {
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 380px;
+            border-radius: 15px;
+        }
+        
+        .left-panel {
+            min-height: 140px;
+            padding: 18px 12px;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .left-panel h1 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .left-panel p {
+            font-size: 11px;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+        
+        .form-wrapper {
+            padding: 18px 12px;
+            max-height: calc(90vh - 140px);
+        }
+        
+        .form-wrapper h2 {
+            font-size: 17px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        .form-group label {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .form-control {
+            padding: 9px 10px;
+            font-size: 12px;
+        }
+        
+        .btn-container {
+            margin-top: 15px;
+            gap: 8px;
+        }
+        
+        .btn-register {
+            padding: 10px;
+            font-size: 14px;
+        }
+        
+        .social-btn {
+            padding: 8px;
+            font-size: 12px;
+        }
+        
+        .social-btn i {
+            font-size: 15px;
+        }
+        
+        .login-link {
+            padding: 8px;
+            font-size: 12px;
+        }
+        
+        .divider {
+            font-size: 11px;
+        }
+    }
+
+    /* Extra Small Mobile - 360px and below */
+    @media (max-width: 360px) {
+        .container {
+            max-width: 340px;
+        }
+        
+        .left-panel {
+            min-height: 130px;
+            padding: 15px 10px;
+        }
+        
+        .left-panel h1 {
+            font-size: 16px;
+        }
+        
+        .left-panel p {
+            font-size: 10px;
+        }
+        
+        .form-wrapper {
+            padding: 15px 10px;
+            max-height: calc(90vh - 130px);
+        }
+        
+        .form-wrapper h2 {
+            font-size: 16px;
+        }
+        
+        .form-control {
+            padding: 8px 9px;
+            font-size: 11px;
+        }
+        
+        .btn-register {
+            padding: 9px;
+            font-size: 13px;
+        }
+        
+        .social-btn {
+            font-size: 11px;
+        }
+        
+        .login-link {
+            font-size: 11px;
+        }
+        
+        .divider {
+            font-size: 10px;
+        }
+    }
+
+    /* Very Small Screens - 320px and below */
+    @media (max-width: 320px) {
+        .container {
+            max-width: 310px;
+            margin: 5px auto;
+        }
+        
+        .left-panel {
+            min-height: 120px;
+            padding: 12px 8px;
+        }
+        
+        .form-wrapper {
+            padding: 12px 8px;
+            max-height: calc(90vh - 120px);
+        }
+        
+        .form-control {
+            padding: 7px 8px;
+        }
+        
+        .btn-register {
+            padding: 8px;
+        }
+    }
+
+    /* Landscape orientation adjustments for mobile */
+    @media (max-height: 600px) and (orientation: landscape) {
+        body {
+            padding: 5px;
+        }
+        
+        .container {
+            flex-direction: row;
+            min-height: auto;
+            max-height: 95vh;
+        }
+        
+        .left-panel {
+            width: 35%;
+            min-height: auto;
+            padding: 15px 10px;
+        }
+        
+        .left-panel h1 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .left-panel p {
+            font-size: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .form-wrapper {
+            width: 65%;
+            padding: 15px 10px;
+            max-height: 95vh;
+        }
+        
+        .form-wrapper h2 {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 8px;
+        }
+        
+        .form-group label {
+            margin-bottom: 3px;
+        }
+        
+        .form-control {
+            padding: 6px 8px;
+        }
+        
+        .btn-container {
+            margin-top: 10px;
+            gap: 6px;
+        }
+        
+        .btn-register, .social-btn, .login-link {
+            padding: 6px;
+            font-size: 11px;
+        }
+    }
+
+    /* Ultra-wide screens adjustments */
+    @media (min-width: 1400px) {
+        .container {
+            max-width: 1000px;
+            min-height: 650px;
+        }
+        
+        .left-panel {
+            padding: 50px 40px;
+        }
+        
+        .left-panel h1 {
+            font-size: 32px;
+        }
+        
+        .left-panel p {
+            font-size: 18px;
+        }
+        
+        .form-wrapper {
+            padding: 50px 45px;
+        }
+        
+        .form-wrapper h2 {
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 22px;
+        }
+        
+        .form-group label {
+            font-size: 16px;
+        }
+        
+        .form-control {
+            padding: 14px 18px;
+            font-size: 16px;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="left-panel">
+        <div class="shape-1"></div>
+        <div class="shape-2"></div>
+        <div class="shape-3"></div>
+        <h1>Join Us Today!</h1>
+        <p>Create an account to access all features and start your journey with us.</p>
+    </div>
+    <div class="form-wrapper">
+        <h2>📝 Create Account</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ registerform|crispy }}
+            <div class="btn-container">
+                <button type="submit" class="btn-register">Register</button>
+                <div class="divider">or</div>
+                <a href="{% provider_login_url 'google' %}" class="social-btn">
+                    <i class="fab fa-google"></i> Sign up with Google
+                </a>
+                <a href="{% url 'login' %}" class="login-link">
+                    Already have an account? Login
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+{% endblock %}

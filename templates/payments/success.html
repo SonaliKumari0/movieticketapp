@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="success-container">
+    <h2>🎉 Payment Successful!</h2>
+    <p>Thank you for your booking. Your payment has been processed successfully.</p>
+    <a href="/allmovies/" class="home-button">Back to Home</a>
+</div>
+
+<style>
+    .success-container {
+        margin: 100px auto;
+        max-width: 600px;
+        text-align: center;
+        padding: 30px;
+        background: #e8f5e9;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        width: 90%;
+    }
+    
+    h2 {
+        color: #2e7d32;
+        margin-bottom: 20px;
+    }
+    
+    .home-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #388e3c;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+    }
+    
+    .home-button:hover {
+        background-color: #2e7d32;
+    }
+    
+    /* Tablet screens */
+    @media screen and (max-width: 768px) {
+        .success-container {
+            margin: 60px auto;
+            padding: 25px;
+            width: 90%;
+        }
+        
+        h2 {
+            font-size: 1.5em;
+        }
+    }
+    
+    /* Mobile screens */
+    @media screen and (max-width: 480px) {
+        .success-container {
+            margin: 40px auto;
+            padding: 20px;
+            width: 95%;
+        }
+        
+        h2 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .home-button {
+            padding: 12px 24px;
+            font-size: 14px;
+        }
+    }
+    
+    /* Very small screens */
+    @media screen and (max-width: 320px) {
+        .success-container {
+            margin: 20px auto;
+            padding: 15px;
+            width: 95%;
+        }
+        
+        h2 {
+            font-size: 1.2em;
+        }
+        
+        p {
+            font-size: 13px;
+        }
+        
+        .home-button {
+            padding: 10px 20px;
+            font-size: 13px;
+        }
+    }
+</style>
+{% endblock %}

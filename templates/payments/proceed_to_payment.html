@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(to right, #f3e5f5, #fce4ec);
+        margin: 0;
+        padding: 30px;
+    }
+    
+    .booking-summary {
+        width: 90%;
+        max-width: 450px;
+        margin: 60px auto;
+        background: #ffffff;
+        padding: 40px 30px;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        animation: zoomIn 0.4s ease;
+    }
+    
+    @keyframes zoomIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    
+    h2, h3 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+    
+    p, li {
+        font-size: 17px;
+        color: #333;
+        margin: 6px 0;
+    }
+    
+    ul {
+        padding-left: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .amount-summary {
+        border-top: 1px solid #ccc;
+        padding-top: 15px;
+        margin-top: 15px;
+    }
+    
+    .amount-summary p {
+        font-size: 17px;
+        font-weight: 500;
+    }
+    
+    .btn-pay {
+        width: 100%;
+        background: linear-gradient(to right, #28a745, #218838);
+        color: white;
+        padding: 14px;
+        font-size: 18px;
+        font-weight: bold;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background 0.3s, transform 0.2s;
+    }
+    
+    .btn-pay:hover {
+        background: linear-gradient(to right, #218838, #1e7e34);
+        transform: scale(1.02);
+    }
+    
+    /* Tablet screens */
+    @media screen and (max-width: 768px) {
+        body {
+            padding: 20px;
+        }
+        
+        .booking-summary {
+            margin: 40px auto;
+            padding: 30px 25px;
+            width: 95%;
+        }
+        
+        h2, h3 {
+            font-size: 1.4em;
+        }
+        
+        p, li {
+            font-size: 16px;
+        }
+        
+        .amount-summary p {
+            font-size: 16px;
+        }
+        
+        .btn-pay {
+            font-size: 17px;
+        }
+    }
+    
+    /* Mobile screens */
+    @media screen and (max-width: 480px) {
+        body {
+            padding: 15px;
+        }
+        
+        .booking-summary {
+            margin: 20px auto;
+            padding: 25px 20px;
+            width: 95%;
+        }
+        
+        h2, h3 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        
+        p, li {
+            font-size: 15px;
+            margin: 5px 0;
+        }
+        
+        .amount-summary p {
+            font-size: 15px;
+        }
+        
+        .btn-pay {
+            padding: 12px;
+            font-size: 16px;
+        }
+        
+        ul {
+            padding-left: 15px;
+        }
+    }
+    
+    /* Very small screens */
+    @media screen and (max-width: 320px) {
+        body {
+            padding: 10px;
+        }
+        
+        .booking-summary {
+            margin: 15px auto;
+            padding: 20px 15px;
+            width: 98%;
+        }
+        
+        h2, h3 {
+            font-size: 1.2em;
+            margin-bottom: 12px;
+        }
+        
+        p, li {
+            font-size: 14px;
+            margin: 4px 0;
+        }
+        
+        .amount-summary p {
+            font-size: 14px;
+        }
+        
+        .btn-pay {
+            padding: 10px;
+            font-size: 15px;
+        }
+        
+        ul {
+            padding-left: 12px;
+        }
+        
+        .amount-summary {
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+    }
+</style>
+
+<div class="booking-summary">
+    <h2> Booking Summary</h2>
+    
+    <p><strong>Movie:</strong> {{ showtime.movie.title }}</p>
+    <p><strong>Theater:</strong> {{ showtime.theater.name }}</p>
+    <p><strong>Screen:</strong> Screen {{ showtime.screen_number }}</p>
+    <p><strong>Showtime:</strong> {{ showtime.show_time|date:"D, d M Y - h:i A" }}</p>
+    
+    <h3>Selected Seats</h3>
+    <ul>
+        {% for seat in tickets %}
+            <li>{{ seat }}</li>
+        {% endfor %}
+    </ul>
+    
+    <div class="amount-summary">
+        <p><strong>Ticket Price:</strong> ₹{{ total_amount }}</p>
+        <p><strong>Convenience Fee:</strong> ₹{{ convenience_fee }}</p>
+        <p><strong>Total Payable:</strong> ₹{{ sub_total }}</p>
+    </div>
+    
+    <form method="POST" action="{% url 'payment' booking.id %}">
+        {% csrf_token %}
+        <button type="submit" id="checkout-button" class="btn-pay">💳 Pay ₹{{ sub_total }}</button>
+    </form>
+</div>
+
+{% endblock %}

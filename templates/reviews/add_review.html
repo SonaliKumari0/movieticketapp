@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Review - {{ movie.title }}</title>
+    <style>
+        :root {
+            --primary: #6a1b9a;
+            --primary-light: #9c27b0;
+            --primary-lighter: #ce93d8;
+            --primary-dark: #4a148c;
+            --accent: #ffc107;
+            --error: #f44336;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --surface: #ffffff;
+            --background: #f5f5f5;
+            --border-radius: 12px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 12px 30px rgba(106, 27, 154, 0.15);
+            --shadow-lg: 0 15px 35px rgba(106, 27, 154, 0.2);
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fce4ec, #f3e5f5, #e8eaf6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px;
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+            font-weight: 600;
+            font-size: 2.2rem;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary-light), var(--primary-lighter));
+            border-radius: 3px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 550px;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
+        form {
+            background-color: var(--surface);
+            padding: 35px 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+        }
+        
+        form:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        label {
+            font-weight: 600;
+            color: var(--primary-dark);
+            display: block;
+            margin-bottom: 8px;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+        }
+        
+        textarea,
+        input[type="number"] {
+            width: 100%;
+            padding: 14px;
+            margin-top: 6px;
+            border: 1px solid #e1bee7;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all var(--transition-normal);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            font-family: inherit;
+        }
+        
+        textarea:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+        
+        textarea::placeholder {
+            color: #bdbdbd;
+        }
+        
+        .char-count {
+            margin-top: 5px;
+            font-size: 13px;
+            text-align: right;
+            color: var(--text-secondary);
+            transition: color var(--transition-fast);
+        }
+        
+        .char-count.warning {
+            color: #ff9800;
+        }
+        
+        .char-count.danger {
+            color: var(--error);
+        }
+        
+        .rating-container {
+            position: relative;
+        }
+        
+        .rating-hint {
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        button {
+            background: linear-gradient(to right, #8e24aa, var(--primary-light));
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            display: block;
+            width: auto;
+            margin: 30px auto 5px;
+            box-shadow: 0 4px 12px rgba(142, 36, 170, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        button:hover {
+            background: linear-gradient(to right, var(--primary-dark), #8e24aa);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(142, 36, 170, 0.4);
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:active {
+            transform: translateY(-1px);
+        }
+        
+        .error {
+            color: var(--error);
+            margin: 15px 0;
+            font-weight: 500;
+            background-color: rgba(244, 67, 54, 0.1);
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--error);
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .success {
+            color: #4caf50;
+            margin: 15px 0;
+            font-weight: 500;
+            background-color: rgba(76, 175, 80, 0.1);
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 3px solid #4caf50;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .back-link {
+            margin-top: 25px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            transition: all var(--transition-normal);
+            padding: 8px 12px;
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+        }
+        
+        .back-link::before {
+            content: '←';
+            margin-right: 8px;
+            transition: transform var(--transition-normal);
+        }
+        
+        .back-link:hover {
+            color: var(--primary-light);
+            background-color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .back-link:hover::before {
+            transform: translateX(-4px);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Star rating visual indicator */
+        .stars-container {
+            display: flex;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .stars-row {
+            display: flex;
+        }
+        
+        .star {
+            color: #e0e0e0;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            margin-right: 5px;
+            position: relative;
+        }
+        
+        .star.active {
+            color: var(--accent);
+        }
+        
+        .star.half:before {
+            content: '★'; 
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50%;
+            overflow: hidden;
+            color: var(--accent);
+        }
+        
+        .star:hover {
+            transform: scale(1.15);
+        }
+        
+        .rating-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-left: 15px;
+            min-width: 40px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.6);
+            padding: 4px 8px;
+            border-radius: 15px;
+        }
+
+        .tag-container {
+            margin-top: 20px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .tag {
+            background-color: rgba(156, 39, 176, 0.1);
+            color: var(--primary);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border: 1px solid transparent;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tag:hover {
+            background-color: rgba(156, 39, 176, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tag.selected {
+            background-color: var(--primary-light);
+            color: white;
+            border: 1px solid var(--primary-dark);
+            box-shadow: 0 2px 8px rgba(106, 27, 154, 0.2);
+        }
+
+        .tag input {
+            display: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            form {
+                padding: 25px 20px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .stars-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .rating-value {
+                margin-left: 0;
+                margin-top: 8px;
+            }
+
+            .tag {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+        }
+
+        /* Animation for form submission */
+        @keyframes formSubmit {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        .form-submitting {
+            animation: formSubmit 0.4s ease;
+        }
+
+        /* Loading spinner for submit button */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading .spinner {
+            display: inline-block;
+        }
+
+        .btn-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Tooltip for better UX */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+        }
+
+        .tooltip .icon {
+            color: var(--primary-lighter);
+            font-size: 16px;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Write a Review for "{{ movie.title }}" 🎬</h1>
+        
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        {% if success %}
+            <p class="success">{{ success }}</p>
+        {% endif %}
+        
+        <form method="post" id="reviewForm">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="review_text">Your Review:</label>
+                <div class="tooltip">
+                    <span class="icon">ⓘ</span>
+                    <span class="tooltip-text">Share what you liked or disliked about the movie. Minimum 20 characters.</span>
+                </div>
+                <textarea name="review_text" id="review_text" rows="5" placeholder="Share your thoughts about the movie... What did you like or dislike? Would you recommend it to others?" required minlength="20"></textarea>
+                <div class="char-count">0 characters (minimum 20)</div>
+            </div>
+            
+            <div class="form-group rating-container">
+                <label for="rating">Rating:</label>
+                <span class="rating-hint">(1-5 stars)</span>
+                
+                <div class="stars-container">
+                    <div class="stars-row">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                    <span class="rating-value">0.0</span>
+                </div>
+                
+                <input type="number" name="rating" id="rating" min="1" max="5" step="0.5" value="1" required>
+            </div>
+            
+            <div class="form-group tag-container">
+                <label for="tags">How would you describe this movie? 🎬</label>
+                <div class="tags">
+                    <label class="tag">
+                        <input type="checkbox" name="tags" value="entertaining"> 🍿 Entertaining
+                    </label>
+                    <label class="tag">
+                        <input type="checkbox" name="tags" value="thought-provoking"> 🤔 Thought-provoking
+                    </label>
+                    <label class="tag">
+                        <input type="checkbox" name="tags" value="visually-stunning"> 🌈 Visually stunning
+                    </label>
+                    <label class="tag">
+                        <input type="checkbox" name="tags" value="well-acted"> 🎭 Well-acted
+                    </label>
+                    <label class="tag">
+                        <input type="checkbox" name="tags" value="original"> 💫 Original
+                    </label>
+                    <label class="tag">
+                        <input type="checkbox" name="tags" value="predictable"> 📝 Predictable
+                    </label>
+                    <label class="tag">
+                        <input type="checkbox" name="tags" value="emotional"> 💖 Emotional
+                    </label>
+                    <label class="tag">
+                        <input type="checkbox" name="tags" value="slow-paced"> 🐢 Slow-paced
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit" id="submitButton">
+                <span class="btn-content">
+                    Submit Review
+                    <span class="spinner"></span>
+                </span>
+            </button>
+        </form>
+        
+        <a href="{% url 'movieview' movie.slug %}" class="back-link">Back to movie</a>
+
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const reviewForm = document.getElementById('reviewForm');
+            const reviewText = document.getElementById('review_text');
+            const charCount = document.querySelector('.char-count');
+            const ratingInput = document.getElementById('rating');
+            const stars = document.querySelectorAll('.star');
+            const ratingValue = document.querySelector('.rating-value');
+            const submitButton = document.getElementById('submitButton');
+            const tags = document.querySelectorAll('.tag');
+            
+            // Hide numerical input and set initial stars
+            ratingInput.style.display = 'none';
+            updateStars(ratingInput.value);
+            
+            // Character counter for review text
+            reviewText.addEventListener('input', function() {
+                const length = this.value.length;
+                charCount.textContent = `${length} character${length !== 1 ? 's' : ''} (minimum 20)`;
+                
+                if (length < 20) {
+                    charCount.classList.add('danger');
+                    charCount.classList.remove('warning');
+                } else if (length < 50) {
+                    charCount.classList.add('warning');
+                    charCount.classList.remove('danger');
+                } else {
+                    charCount.classList.remove('warning', 'danger');
+                }
+            });
+            
+            // Star rating functionality
+            stars.forEach(star => {
+                // Click to set rating
+                star.addEventListener('click', function() {
+                    const value = parseFloat(this.getAttribute('data-value'));
+                    ratingInput.value = value;
+                    updateStars(value);
+                });
+                
+                // Hover effects with half-star support
+                star.addEventListener('mousemove', function(e) {
+                    const box = this.getBoundingClientRect();
+                    const position = (e.clientX - box.left) / box.width;
+                    const starValue = parseFloat(this.getAttribute('data-value'));
+                    
+                    if (position <= 0.5) {
+                        // Half star
+                        if (starValue - 0.5 >= 1) {
+                            tempUpdateStars(starValue - 0.5);
+                        }
+                    } else {
+                        // Full star
+                        tempUpdateStars(starValue);
+                    }
+                });
+            });
+            
+            // Update stars based on input value
+            function updateStars(value) {
+                value = parseFloat(value);
+                ratingInput.value = value;
+                ratingValue.textContent = value.toFixed(1);
+                
+                stars.forEach(star => {
+                    const starValue = parseFloat(star.getAttribute('data-value'));
+                    
+                    // Remove all classes first
+                    star.classList.remove('active', 'half');
+                    
+                    // Apply appropriate class
+                    if (starValue <= value) {
+                        star.classList.add('active');
+                    } else if (starValue - 0.5 <= value) {
+                        star.classList.add('half');
+                    }
+                });
+            }
+            
+            // Temporary update for hover effect
+            function tempUpdateStars(value) {
+                ratingValue.textContent = value.toFixed(1);
+                
+                stars.forEach(star => {
+                    const starValue = parseFloat(star.getAttribute('data-value'));
+                    
+                    // Remove all classes
+                    star.classList.remove('active', 'half');
+                    
+                    // Apply appropriate class based on hover position
+                    if (starValue <= value) {
+                        star.classList.add('active');
+                    } else if (starValue - 0.5 <= value && Math.floor(value) !== value) {
+                        star.classList.add('half');
+                    }
+                });
+            }
+            
+            // Reset stars on mouse leave
+            document.querySelector('.stars-container').addEventListener('mouseleave', function() {
+                updateStars(ratingInput.value);
+            });
+            
+            // Tag selection
+            tags.forEach(tag => {
+                const checkbox = tag.querySelector('input[type="checkbox"]');
+                
+                // Fix tag selection issue
+                tag.addEventListener('click', function(e) {
+                    // Prevent triggering twice when clicking directly on checkbox
+                    if (e.target !== checkbox) {
+                        this.classList.toggle('selected');
+                        checkbox.checked = !checkbox.checked;
+                    } else {
+                        // Make sure visual state matches checkbox state
+                        setTimeout(() => {
+                            if (checkbox.checked) {
+                                this.classList.add('selected');
+                            } else {
+                                this.classList.remove('selected');
+                            }
+                        }, 0);
+                    }
+                });
+
+                // Initialize selected state based on checkbox
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        tag.classList.add('selected');
+                    } else {
+                        tag.classList.remove('selected');
+                    }
+                });
+            });
+            
+            // Form submission with animation
+            reviewForm.addEventListener('submit', function(e) {
+                // Basic validation
+                if (reviewText.value.length < 20) {
+                    e.preventDefault();
+                    charCount.classList.add('danger');
+                    reviewText.focus();
+                    return false;
+                }
+                
+                // Visual feedback for submission
+                this.classList.add('form-submitting');
+                submitButton.classList.add('loading');
+                submitButton.disabled = true;
+                
+                // Allow the animation to complete
+                setTimeout(() => {
+                    // Form would naturally submit after timeout
+                }, 400);
+            });
+
+            // Auto-expand textarea
+            reviewText.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+
+            // Set focus on the textarea when page loads
+            setTimeout(() => {
+                reviewText.focus();
+            }, 300);
+        });
+    </script>
+</body>
+</html>
